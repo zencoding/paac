@@ -146,15 +146,15 @@ class NIPSNetwork(Network):
 
                 #_, _, conv2 = conv2d('conv2', conv1, 32, 4, 16, 2)
 
-                _, _, fc1 = fc('fc1', self.input, 512, activation="relu")
+                _, _, fc1 = fc('fc1', self.input, 16, activation="relu")
 
-                _,_,fc2 = fc('fc2',fc1,128,activation='relu')
+                #_,_,fc2 = fc('fc2',fc1,128,activation='relu')
 
-                _,_,fc3 = fc('fc3',fc2,64,activation='relu')
+                #_,_,fc3 = fc('fc3',fc2,64,activation='relu')
 
-                _,_,fc4 = fc('fc4',fc3,16,activation = 'relu')
+                #_,_,fc4 = fc('fc4',fc3,16,activation = 'relu')
 
-                self.output = fc4
+                self.output = fc1
 
 
 class NatureNetwork(Network):

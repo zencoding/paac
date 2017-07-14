@@ -48,23 +48,23 @@ class ActorLearner(Process):
         # This is not really an operation, but a list of gradient Tensors.
         # When calling run() on it, the value of those Tensors
         # (i.e., of the gradients) will be calculated
-        if args.clip_norm_type == 'ignore':
-            # Unclipped gradients
-            global_norm = tf.global_norm([g for g, v in grads_and_vars], name='global_norm')
-        elif args.clip_norm_type == 'global':
-            # Clip network grads by network norm
-            gradients_n_norm = tf.clip_by_global_norm(
-                [g for g, v in grads_and_vars], args.clip_norm)
-            global_norm = tf.identity(gradients_n_norm[1], name='global_norm')
-            grads_and_vars = list(zip(gradients_n_norm[0], [v for g, v in grads_and_vars]))
-        elif args.clip_norm_type == 'local':
-            # Clip layer grads by layer norm
-            gradients = [tf.clip_by_norm(
-                g, args.clip_norm) for g in grads_and_vars]
-            grads_and_vars = list(zip(gradients, [v for g, v in grads_and_vars]))
-            global_norm = tf.global_norm([g for g, v in grads_and_vars], name='global_norm')
-        else:
-            raise Exception('Norm type not recognized')
+        # if args.clip_norm_type == 'ignore':
+        #     # Unclipped gradients
+        #     global_norm = tf.global_norm([g for g, v in grads_and_vars], name='global_norm')
+        # elif args.clip_norm_type == 'global':
+        #     # Clip network grads by network norm
+        #     gradients_n_norm = tf.clip_by_global_norm(
+        #         [g for g, v in grads_and_vars], args.clip_norm)
+        #     global_norm = tf.identity(gradients_n_norm[1], name='global_norm')
+        #     grads_and_vars = list(zip(gradients_n_norm[0], [v for g, v in grads_and_vars]))
+        # elif args.clip_norm_type == 'local':
+        #     # Clip layer grads by layer norm
+        #     gradients = [tf.clip_by_norm(
+        #         g, args.clip_norm) for g in grads_and_vars]
+        #     grads_and_vars = list(zip(gradients, [v for g, v in grads_and_vars]))
+        #     global_norm = tf.global_norm([g for g, v in grads_and_vars], name='global_norm')
+        # else:
+        #     raise Exception('Norm type not recognized')
         self.flat_clipped_gradients = tf.concat([tf.reshape(g, [-1]) for g, v in grads_and_vars], axis=0)
 
         self.train_step = self.optimizer.apply_gradients(grads_and_vars)
@@ -83,8 +83,10 @@ class ActorLearner(Process):
 
         # Summaries
         variable_summaries(self.flat_raw_gradients, 'raw_gradients')
-        variable_summaries(self.flat_clipped_gradients, 'clipped_gradients')
-        tf.summary.scalar('global_norm', global_norm)
+        #variable_summaries(self.flat_clipped_gradients, 'clipped_gradients')
+        #tf.summary.scalar('global_norm', global_norm)
+        tf.summary.scalar('Loss',self.network.loss)
+        variable_summaries(self.network.output_layer_v,'Values')
 
     def save_vars(self, force=False):
         if force or self.global_step - self.last_saving_step >= CHECKPOINT_INTERVAL:

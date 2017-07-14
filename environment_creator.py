@@ -6,13 +6,19 @@ class EnvironmentCreator(object):
         :param args:
         """
 
-        from atari_emulator import AtariEmulator
-        from ale_python_interface import ALEInterface
-        filename = args.rom_path + "/" + args.game + ".bin"
-        ale_int = ALEInterface()
-        ale_int.loadROM(str.encode(filename))
-        self.num_actions = len(ale_int.getMinimalActionSet())
-        self.create_environment = lambda i: AtariEmulator(i, args)
+        # from atari_emulator import AtariEmulator
+        # from ale_python_interface import ALEInterface
+        # filename = args.rom_path + "/" + args.game + ".bin"
+        # ale_int = ALEInterface()
+        # ale_int.loadROM(str.encode(filename))
+        # self.num_actions = len(ale_int.getMinimalActionSet())
+        # self.create_environment = lambda i: AtariEmulator(i, args)
+
+        from cartpole import CartPole
+
+        cartpole_ent = CartPole(0,args)
+        self.num_actions = len(cartpole_ent.legal_actions)
+        self.create_environment = lambda i : CartPole(i,args)
 
 
 
