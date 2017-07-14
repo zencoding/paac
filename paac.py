@@ -39,9 +39,10 @@ class PAACLearner(ActorLearner):
         """
         # Subtract a tiny value from probabilities in order to avoid
         # "ValueError: sum(pvals[:-1]) > 1.0" in numpy.multinomial
-        probs = probs - np.finfo(np.float32).epsneg
+        #probs = probs - np.finfo(np.float32).epsneg
 
-        action_indexes = [int(np.nonzero(np.random.multinomial(1, p))[0]) for p in probs]
+        #action_indexes = [int(np.nonzero(np.random.multinomial(1, p))[0]) for p in probs]
+        action_indexes = [int(np.random.choice(probs.shape[1],p=prob)) for prob in probs]
         return action_indexes
 
     def _get_shared(self, array, dtype=c_float):
@@ -71,7 +72,7 @@ class PAACLearner(ActorLearner):
         total_rewards = []
 
         # state, reward, episode_over, action
-        variables = [(np.asarray([emulator.get_initial_state() for emulator in self.emulators], dtype=np.uint8)),
+        variables = [(np.asarray([emulator.get_initial_state() for emulator in self.emulators], dtype=np.float32)),
                      (np.zeros(self.emulator_counts, dtype=np.float32)),
                      (np.asarray([False] * self.emulator_counts, dtype=np.float32)),
                      (np.zeros((self.emulator_counts, self.num_actions), dtype=np.float32))]
@@ -111,6 +112,9 @@ class PAACLearner(ActorLearner):
                 values[t] = readouts_v_t
                 states[t] = shared_states
 
+                #counts of different action indexes
+
+
                 # Start updating all environments with next_actions
                 self.runners.update_environments()
                 self.runners.wait_updated()
@@ -120,7 +124,7 @@ class PAACLearner(ActorLearner):
 
                 for e, (actual_reward, episode_over) in enumerate(zip(shared_rewards, shared_episode_over)):
                     total_episode_rewards[e] += actual_reward
-                    actual_reward = self.rescale_reward(actual_reward)
+                    #actual_reward = self.rescale_reward(actual_reward)
                     rewards[t, e] = actual_reward
 
                     emulator_steps[e] += 1

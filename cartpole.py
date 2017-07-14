@@ -59,9 +59,11 @@ class CartPole(BaseEnvironment):
     def __action_repeat(self, a, times=ACTION_REPEAT):
         """ Repeat action and grab screen into frame pool """
         reward = 0
+        done = False
         for i in range(times):
-            s_,r,done,info = self.gym.step(self.legal_actions[a])
-            reward += r
+            if not done:
+                s_,r,done,info = self.gym.step(self.legal_actions[a])
+                reward += r
         return s_,reward,done,info
 
     def get_initial_state(self):
