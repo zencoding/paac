@@ -154,8 +154,6 @@ class NIPSNetwork(Network):
 
                 self.output = fc3
 
-                # self.output = fc1
-
 
 class NatureNetwork(Network):
     def __init__(self, conf):
