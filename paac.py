@@ -39,10 +39,10 @@ class PAACLearner(ActorLearner):
         """
         # Subtract a tiny value from probabilities in order to avoid
         # "ValueError: sum(pvals[:-1]) > 1.0" in numpy.multinomial
-        #probs = probs - np.finfo(np.float32).epsneg
+        # probs = probs - np.finfo(np.float32).epsneg
 
-        #action_indexes = [int(np.nonzero(np.random.multinomial(1, p))[0]) for p in probs]
-        action_indexes = [int(np.random.choice(probs.shape[1],p=prob)) for prob in probs]
+        # action_indexes = [int(np.nonzero(np.random.multinomial(1, p))[0]) for p in probs]
+        action_indexes = [int(np.random.choice(probs.shape[1], p=prob)) for prob in probs]
         return action_indexes
 
     def _get_shared(self, array, dtype=c_float):
@@ -90,7 +90,9 @@ class PAACLearner(ActorLearner):
         y_batch = np.zeros((self.max_local_steps, self.emulator_counts))
         adv_batch = np.zeros((self.max_local_steps, self.emulator_counts))
         rewards = np.zeros((self.max_local_steps, self.emulator_counts))
-        states = np.zeros([self.max_local_steps] + list(shared_states.shape), dtype=np.uint8)
+        # Change to fix PAAC
+        # states = np.zeros([self.max_local_steps] + list(shared_states.shape), dtype=np.uint8)
+        states = np.zeros([self.max_local_steps] + list(shared_states.shape), dtype=np.float32)
         actions = np.zeros((self.max_local_steps, self.emulator_counts, self.num_actions))
         values = np.zeros((self.max_local_steps, self.emulator_counts))
         episodes_over_masks = np.zeros((self.max_local_steps, self.emulator_counts))
@@ -112,7 +114,7 @@ class PAACLearner(ActorLearner):
                 values[t] = readouts_v_t
                 states[t] = shared_states
 
-                #counts of different action indexes
+                # counts of different action indexes
 
 
                 # Start updating all environments with next_actions
@@ -124,7 +126,7 @@ class PAACLearner(ActorLearner):
 
                 for e, (actual_reward, episode_over) in enumerate(zip(shared_rewards, shared_episode_over)):
                     total_episode_rewards[e] += actual_reward
-                    #actual_reward = self.rescale_reward(actual_reward)
+                    # actual_reward = self.rescale_reward(actual_reward)
                     rewards[t, e] = actual_reward
 
                     emulator_steps[e] += 1
